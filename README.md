@@ -14,13 +14,13 @@ DHT22 is a sensor device that measures the temperature and humidty. DHT22 Librar
 - GPIO is set to output
 - Data bus must be high during idle for at least 1-2 seconds.
 - Data bus is dragged low for 1mS.
-- Data bus is pulsed high for 30uS.
-- Wait for DHT22 response of 80uS low before data bits are sent
+- Data bus is pulsed high for 30uS and immediately GPIO is set to input.
+- Wait for DHT22 response of 80uS low before data bits are sent.
 
 ![signal]
 
 ## Signal Interpretation
-The DHT22 sensor always sends out a ~50uS low signal as an indication of the start of a bit transmission. When it is high for 26-30us it is a '0' bit, if it is high for around ~70uS it is a '1' bit.
+The DHT22 sensor always sends out a ~50uS low signal as an indication of the start of a bit transmission. When it is high for 26-30us it is a '0' bit, if it is high for ~70uS it is a '1' bit. The whole transmission will last around 5mS.
 
 
 [signal]: https://raw.githubusercontent.com/mfn04/ESP32-DHT22-LIBRARY/refs/heads/main/imgs/dht-signal.png
