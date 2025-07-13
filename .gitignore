@@ -1,0 +1,5 @@
+.pio
+.vscode
+sdkconfig.firebeetle32
+lib
+test
