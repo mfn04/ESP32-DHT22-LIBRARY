@@ -63,20 +63,20 @@ dht22_err_t dht22_probe(){
     // Change mode to output and set LOW level for 1mS
     DHT22_ESP_ERR_CHECK(gpio_set_direction(dht22_gpio_pin,GPIO_MODE_OUTPUT));
     DHT22_ESP_ERR_CHECK(gpio_set_level(dht22_gpio_pin, 0));
-    esp_rom_delay_us(1000);
+    esp_rom_delay_us(DHT22_DELAY_START_LOW_US);
 
     // Set HIGH for 30uS
     DHT22_ESP_ERR_CHECK(gpio_set_level(dht22_gpio_pin, 1));
-    esp_rom_delay_us(30);
+    esp_rom_delay_us(DHT22_DELAY_START_HIGH_US);
     
     // Change mode to input and wait 5mS (transmission estimate)
     DHT22_ESP_ERR_CHECK(gpio_set_direction(dht22_gpio_pin,GPIO_MODE_INPUT));
-    esp_rom_delay_us(10000);
+    esp_rom_delay_us(DHT22_DELAY_TRANSMISSION_US);
 
     // Change mode back to output and resume idle HIGH with a 1mS delay for safety
     DHT22_ESP_ERR_CHECK(gpio_set_direction(dht22_gpio_pin,GPIO_MODE_OUTPUT));
     DHT22_ESP_ERR_CHECK(gpio_set_level(dht22_gpio_pin, 1));
-    esp_rom_delay_us(1000);
+    esp_rom_delay_us(DHT22_DELAY_IDLE_RECOVERY_US);
     
     dht22_current_status = DHT22_OK;
     return dht22_current_status;
@@ -107,10 +107,11 @@ dht22_err_t dht22_format(){
 
     // Skip first two edges (handshake) and last edge which is idle
     for(int i = 2; i < dht22_positive_edges_caught-1; i++){
-        if(dht22_high_times_micros[i] > 30){
+        if(dht22_high_times_micros[i] > DHT22_BIT_THRESHOLD_US){
             dht22_data[byte_index] |= MASK;
         }
         MASK >>= 1;
+        // Reset mask when it is 0
         if(MASK == 0){
             MASK = 0b10000000;
             byte_index++;

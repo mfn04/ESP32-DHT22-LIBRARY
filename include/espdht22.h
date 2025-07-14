@@ -6,18 +6,25 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 
+#define DHT22_DELAY_START_LOW_US 1000       // Initiation delay used to set signal LOW (in microseconds)
+#define DHT22_DELAY_START_HIGH_US 30        // Initiation delay used to set signal HIGH (in microseconds)
+#define DHT22_DELAY_TRANSMISSION_US 10000   // Time to wait for input signal from DHT22 (in microseconds)
+#define DHT22_DELAY_IDLE_RECOVERY_US 1000   // Time to wait after received signal (in microseconds)
+
+#define DHT22_BIT_THRESHOLD_US 30           // The bit threshold to determine whether a bit is 0 or 1
+
 #define DHT22_HIGH 1
 #define DHT22_LOW 0
 
-#define DHT22_POSITIVE_EDGES_EXPECTED 43
-#define DHT22_FRAMES_EXPECTED 5
+#define DHT22_POSITIVE_EDGES_EXPECTED 43    // Matches the amount of HIGH signals received
+#define DHT22_FRAMES_EXPECTED 5             // Size of data array which represents frames in bytes
 
 // Wrapper for ESP Functions to update DHT22 error
 #define DHT22_ESP_ERR_CHECK(esp_err) { dht22_current_esp_status = esp_err; if(dht22_current_esp_status != ESP_OK){ dht22_current_status = DHT22_ESP_ERROR; ESP_LOGI("ERROR","ESP TRIGGERED %d", dht22_current_esp_status); return dht22_current_status; }  }
 
 typedef enum {
     DHT22_CHECKSUM_ERROR,   // Failure to validate the data received from DHT22
-    DHT22_ESP_ERROR,       // Failed to initialize the DHT22 library due to internal ESP32 errors check dht22_last_esp_error
+    DHT22_ESP_ERROR,        // Failed to initialize the DHT22 library due to internal ESP32 errors check dht22_last_esp_error
     DHT22_NO_PROBE,         // The function probe was never called
     DHT22_OK                // DHT22 is functioning correctly
 } dht22_err_t;
