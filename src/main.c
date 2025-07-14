@@ -23,6 +23,7 @@ void dht_probe(){
         esp_rom_delay_us(5000);
         gpio_set_direction(GPIO_PIN,GPIO_MODE_OUTPUT);
         gpio_set_level(GPIO_PIN, 1);
+        esp_rom_delay_us(2000);
 }
 
 // From Logic Analyzer it was found that there are 43 positive edges and 86 edges in total during transmission
@@ -88,7 +89,6 @@ void app_main() {
 
         dht_probe();
         dht_format();
-        vTaskDelay(pdMS_TO_TICKS(1000));
 
         ESP_LOGI("DEBUG", "Edges caught: %d", positive_edges_caught);
         for(int i = 0; i < positive_edges_caught; i++){
@@ -96,7 +96,7 @@ void app_main() {
             high_times_micros[i] = 0;
         }
         positive_edges_caught = 0;
-        int checksum = data[0] + data[1] + data[2] + data[3];
+        uint8_t checksum = data[0] + data[1] + data[2] + data[3];
         if(checksum == data[4]){
             float temp = (float)data[0] + ((float)data[1])/10;
             float humi = (float)data[2] + ((float)data[3])/10;
@@ -106,7 +106,7 @@ void app_main() {
             ESP_LOGI("INFO", "Temperature: %d, Temperature Decimal: %d, Humidity: %d, Humidity Decimal: %d, Checksum: %d",data[0], data[1], data[2], data[3], data[4]);
             ESP_LOGI("INFO", "Checksum failed!");
         }
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(2000));
     }
 
 }
